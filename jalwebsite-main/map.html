@@ -1,0 +1,130 @@
+<<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bengaluru Water Quality Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        #waterMap {
+            width: 100%;
+            height: 600px;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .legend h3 {
+            margin: 0;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .legend p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div id="waterMap"></div>
+    <div class="legend">
+        <h3>Water Quality Legend</h3>
+        <p>🟢 Clean Water Bodies</p>
+        <p>🔴 Contaminated Water Bodies</p>
+        <p>🟡 Moderate Risk Areas</p>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Bengaluru Water Quality Data with improved coordinates
+        const bengaluruWaterData = [
+            {
+                name: "Bellandur Lake",
+                coords: [12.93521, 77.66610],
+                type: "contaminated",
+                description: "Heavily polluted lake with chemical contamination"
+            },
+            {
+                name: "Ulsoor Lake",
+                coords: [12.984241, 77.619678],
+                type: "moderate",
+                description: "Urban lake with moderate pollution levels"
+            },
+            {
+                name: "Hesaraghatta Lake",
+                coords: [13.16644, 77.49231],
+                type: "clean",
+                description: "Relatively clean water body"
+            },
+            {
+                name: "Varthur Lake",
+                coords: [12.94754, 77.73934],
+                type: "contaminated",
+                description: "Severely polluted lake with ecological damage"
+            },
+            {
+                name: "Madiwala Lake",
+                coords: [12.90906, 77.61806],
+                type: "moderate",
+                description: "Urban lake with restoration efforts"
+            }
+            
+        ];
+
+        // Create map
+        const map = L.map('waterMap').setView([12.9716, 77.5946], 11);
+
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Add markers for each water body
+        bengaluruWaterData.forEach(data => {
+            let markerColor;
+
+            // Set marker color based on water quality
+            switch (data.type) {
+                case 'clean':
+                    markerColor = 'green';
+                    break;
+                case 'contaminated':
+                    markerColor = 'red';
+                    break;
+                case 'moderate':
+                    markerColor = 'yellow';
+                    break;
+                default:
+                    markerColor = 'gray';
+            }
+
+            // Add circle marker to the map
+            L.circleMarker(data.coords, {
+                radius: 10,
+                color: markerColor,
+                fillColor: markerColor,
+                fillOpacity: 0.7
+            }).addTo(map).bindPopup(`
+                <strong>${data.name}</strong><br>
+                Status: ${data.type.toUpperCase()}<br>
+                ${data.description}
+            `);
+        });
+    </script>
+</body>
+</html>

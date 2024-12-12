@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jal Sanjeevni - Voice Interaction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        #chat-box {
+            width: 80%;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #response-audio {
+            margin-top: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 32px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:disabled {
+            background-color: #aaa;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Jal Sanjeevni Voice Interaction</h1>
+    <div id="chat-box">
+        <h2>Ask a question:</h2>
+        <button id="start-recognition" onclick="startRecognition()">Start Voice Input</button>
+        <p id="text-output">Waiting for your voice...</p>
+        <audio id="response-audio" controls></audio>
+    </div>
+
+    <script>
+        // Speech Recognition Setup
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'en-US';
+        recognition.interimResults = true;
+
+        recognition.onresult = function(event) {
+            const speechToText = event.results[0][0].transcript;
+            document.getElementById("text-output").textContent = "You said: " + speechToText;
+            sendTextToBackend(speechToText);
+        };
+
+        recognition.onerror = function(event) {
+            console.error("Recognition error:", event.error);
+        };
+
+        function startRecognition() {
+            document.getElementById("start-recognition").disabled = true;
+            recognition.start();
+        }
+
+        // Send text to the backend to process it and get a response
+        function sendTextToBackend(text) {
+            fetch('/process_text', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: text }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const audioUrl = data.audio_url;
+                const audioElement = document.getElementById('response-audio');
+                audioElement.src = audioUrl;
+                audioElement.play();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Quality Monitoring Platform</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Matemasi&family=Pixelify+Sans:wght@400..700&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --background-color: #ecf0f1;
+            --text-color: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab:hover, .tab.active {
+            color: var(--secondary-color);
+            border-bottom-color: var(--secondary-color);
+        }
+
+        .content-section {
+            display: none;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .testing-kit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .kit-card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .kit-card:hover {
+            transform: scale(1.05);
+        }
+
+        #reportForm {
+            display: grid;
+            gap: 15px;
+        }
+
+        #reportForm input, 
+        #reportForm textarea, 
+        #reportForm select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <header style="background: linear-gradient(90deg, #ffffff, #038bfa); padding: 20px; color: rgb(3, 146, 249); display: flex; align-items: center; justify-content: space-between;">
+            <div class="logo" style="display: flex; align-items: center;">
+                <img src="jal_sanjeevni_logo.png" alt="Jal Sanjeevni Logo" style="height: 80px; margin-right: 15px;">
+                <h1 style="margin: 0; font-size: 1.5rem;">Jal Sanjeevni</h1>
+            </div>
+            <nav>
+                <ul style="list-style: none; margin: 0; padding: 0; display: flex; gap: 15px;">
+                    <li><a href="index.html" class="pixelify-sans-navbar" style="text-decoration: none; color: white; font-weight: bold;">Home</a></li>
+                    <li><a href="techniques copy.html" class="pixelify-sans-navbar" style="text-decoration: none; color: white; font-weight: bold;">Techniques</a></li>
+                    <li><a href="case-studies.html" class="pixelify-sans-navbar" style="text-decoration: none; color: white; font-weight: bold;">Case Studies</a></li>
+                    <li><a href="forum.html" class="pixelify-sans-navbar" style="text-decoration: none; color: white; font-weight: bold;">Forum</a></li>
+                    <li><a href="login.html" class="pixelify-sans-navbar" style="text-decoration: none; color: white; font-weight: bold;">Login</a></li>
+                    <li><a href="gallery.html" class="pixelify-sans-navbar" style="text-decoration: none; color: white; font-weight: bold;">Gallery</a></li>
+                    <li><a href="workshops.html" class="pixelify-sans-navbar" style="text-decoration: none; color: white; font-weight: bold;">Workshops</a></li>
+                    <li><a href="water-conservation-challenges.html" class="pixelify-sans-navbar" style="text-decoration: none; color: white; font-weight: bold;">Challenges</a></li>
+                    <li><a href="irrihelp.html" class="pixelify-sans-navbar" style="text-decoration: none; color: white; font-weight: bold;">Irrihelp</a></li>
+                    <li><a href="course.html" class="pixelify-sans-navbar" style="text-decoration: none; color: white; font-weight: bold;">Course</a></li>
+                    <li><a href="articles.html" class="pixelify-sans-navbar" style="text-decoration: none; color: white; font-weight: bold;">Article</a></li>
+                    <li><a href="bot.html" class="pixelify-sans-navbar" style="text-decoration: none; color: white; font-weight: bold;">AI BOT</a></li>
+                </ul>
+            </nav>
+        </header>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" data-tab="testing-kits">Water Testing Kits</div>
+        <div class="tab" data-tab="reporting">Reporting System</div>
+        <div class="tab" data-tab="water-map">Interactive Water Map</div>
+        <div class="tab" data-tab="water-map-2">Interactive Land Map</div>
+    </div>
+
+    <div class="container">
+        <!-- Water Testing Kits Section -->
+        <section id="testing-kits" class="content-section active">
+            <h2>Local Water Quality Monitoring Kits</h2>
+            <div class="testing-kit-grid">
+                <div class="kit-card">
+                    <i class="fas fa-vial fa-3x" style="color: var(--secondary-color);"></i>
+                    <h3>Basic Home Test Kit</h3>
+                    <p>Test for pH, chlorine, and basic contaminants</p>
+                    <button class="btn">Learn More</button>
+                </div>
+                <div class="kit-card">
+                    <i class="fas fa-flask fa-3x" style="color: var(--secondary-color);"></i>
+                    <h3>Advanced Water Analysis Kit</h3>
+                    <p>Comprehensive testing for heavy metals and pollutants</p>
+                    <button class="btn">Learn More</button>
+                </div>
+                <div class="kit-card">
+                    <i class="fas fa-tint fa-3x" style="color: var(--secondary-color);"></i>
+                    <h3>Portable Water Quality Meter</h3>
+                    <p>Real-time digital water quality measurements</p>
+                    <button class="btn">Learn More</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reporting System Section -->
+        <section id="reporting" class="content-section">
+            <h2>Water Quality Issue Reporting</h2>
+            <form id="reportForm">
+                <input type="text" id="location" placeholder="Location (City/Region)" required>
+                <textarea id="issueDescription" placeholder="Describe the issue..." rows="4" required></textarea>
+                <select id="severity" required>
+                    <option value="">Select Severity</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+                <button type="submit" class="btn">Submit Report</button>
+            </form>
+        </section>
+
+        <!-- Interactive Water Map Section -->
+        <section id="water-map" class="content-section">
+            <h2>Explore Water Quality on Map</h2>
+            <p>Click the button below to view water quality data on an interactive map.</p>
+            <button class="btn" onclick="window.location.href='map.html';">Go to Map</button>
+        </section>
+
+        <!-- Interactive Land Map Section -->
+        <section id="water-map-2" class="content-section">
+            <h2>Explore Land Quality on Map</h2>
+            <p>Click the button below to view land quality data on an interactive land map.</p>
+            <button class="btn" onclick="window.location.href='landmap.html';">Go to Map</button>
+        </section>
+    </div>
+
+    <script>
+        const tabs = document.querySelectorAll('.tab');
+        const sections = document.querySelectorAll('.content-section');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                const target = tab.getAttribute('data-tab');
+                sections.forEach(section => {
+                    if (section.id === target) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+            });
+        });
+
+        document.getElementById('reportForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent the default form submission
+        
+            // Get form data
+            const location = document.getElementById('location').value;
+            const issueDescription = document.getElementById('issueDescription').value;
+            const severity = document.getElementById('severity').value;
+        
+            // Prepare the content for the text file
+            const reportContent = `
+        Location: ${location}
+        Issue Description: ${issueDescription}
+        Severity: ${severity}
+            `;
+        
+            // Create a Blob with the report content
+            const blob = new Blob([reportContent], { type: 'text/plain' });
+        
+            // Create a link element
+            const link = document.createElement('a');
+        
+            // Set the download attribute with the desired filename
+            link.download = 'water_quality_report.txt';
+        
+            // Create a URL for the Blob and set it as the href
+            link.href = URL.createObjectURL(blob);
+        
+            // Trigger the click event to download the file
+            link.click();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agricultural Land Suitability Map</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        #cropMap {
+            width: 100%;
+            height: 600px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+        }
+        .legend {
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+        }
+        .legend h3 {
+            margin: 0;
+        }
+        .legend p {
+            margin: 5px 0;
+        }
+        .crop-info {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+</head>
+<body>
+    <div id="cropMap">Loading map...</div>
+    <div class="legend">
+        <h3>Land Suitability Legend</h3>
+        <p><span style="color: green;">●</span> Excellent for Irrigation & Crop Growth</p>
+        <p><span style="color: yellow;">●</span> Moderate Suitability</p>
+        <p><span style="color: red;">●</span> Poor Suitability</p>
+        <div class="crop-info">
+            <strong>Crop Focus: Cotton Suitability</strong>
+            <p>Hover over markers for detailed information</p>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check if Leaflet.js is loaded
+            if (typeof L !== 'undefined') {
+                // Land suitability data
+                const landSuitabilityData = [
+                    { name: "Dharwad Region", coords: [15.4589, 74.9120], type: "excellent", cropSuitability: "Highly Suitable for Cotton", description: "Black cotton soil, excellent drainage, ideal rainfall. Recommended cotton varieties: Bt Cotton, DCH-1188" },
+                    { name: "Bijapur Region", coords: [16.8303, 75.7101], type: "moderate", cropSuitability: "Moderate Cotton Potential", description: "Mixed soil conditions. Requires careful water management. Recommended varieties with drought resistance" },
+                    { name: "Gulbarga Region", coords: [17.3296, 76.8343], type: "poor", cropSuitability: "Low Cotton Suitability", description: "Rocky terrain, poor water retention. Not recommended for cotton without significant land preparation" },
+                    { name: "Belgaum Region", coords: [15.8497, 74.4976], type: "excellent", cropSuitability: "Premium Cotton Growing Area", description: "Fertile black soil, consistent rainfall. Ideal for high-yield cotton farming" },
+                    { name: "Bagalkot Region", coords: [16.1633, 75.7082], type: "moderate", cropSuitability: "Conditional Cotton Growing", description: "Variable soil quality. Requires supplemental irrigation and soil enrichment" }
+                ];
+
+                // Initialize map
+                const map = L.map('cropMap').setView([15.3173, 75.7139], 8);
+
+                // Add tile layer
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '©️ OpenStreetMap contributors'
+                }).addTo(map);
+
+                // Add markers
+                landSuitabilityData.forEach(data => {
+                    const markerColor = {
+                        excellent: 'green',
+                        moderate: 'yellow',
+                        poor: 'red'
+                    }[data.type] || 'gray';
+
+                    L.circleMarker(data.coords, {
+                        radius: 12,
+                        color: markerColor,
+                        fillColor: markerColor,
+                        fillOpacity: 0.7
+                    })
+                        .addTo(map)
+                        .bindPopup(`
+                            <strong>${data.name}</strong><br>
+                            Suitability: ${data.cropSuitability}<br>
+                            ${data.description}
+                        `);
+                });
+            } else {
+                document.getElementById('cropMap').innerHTML = 'Error: Unable to load the map. Please check your internet connection.';
+            }
+        });
+    </script>
+</body>
+</html>
